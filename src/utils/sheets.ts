@@ -40,6 +40,9 @@ export async function syncToSheets(url: string, data: Lancamento[]) {
     const resp = await fetch(url, {
         method: 'POST',
         redirect: 'follow',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+        },
         body: JSON.stringify({ action: 'saveAll', data: sheetsData })
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);

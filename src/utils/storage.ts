@@ -1,7 +1,7 @@
 import { Lancamento } from '../types';
 
 export const STORAGE_KEY = 'container_lancamentos';
-export const CONFIG_KEY = 'container_config_v2';
+export const CONFIG_KEY = 'container_config_v3';
 
 let localStorageAvailable = false;
 try {
