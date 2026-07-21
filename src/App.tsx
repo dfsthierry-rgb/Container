@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Ship, Plus, Filter, Download, FileText, Database, HardDrive, RefreshCw } from 'lucide-react';
 import { Lancamento } from './types';
 import { getData, saveData, loadConfigUrl, saveConfigUrl } from './utils/storage';
-import { syncFromSheets } from './utils/sheets';
+import { syncFromSheets, syncToSheets } from './utils/sheets';
 import { getBestDate } from './utils/dateUtils';
 import { exportToExcel, exportToPDF } from './utils/exportUtils';
 import Dashboard from './components/Dashboard';
@@ -53,19 +53,22 @@ export default function App() {
 
   const filteredLancamentos = useMemo(() => {
     const withIdx = lancamentos.map((l, idx) => ({ ...l, _idx: idx }));
-    if (!fAno && !fMes && !fTipo && !fExp) return withIdx;
-    return withIdx.filter(l => {
-      const d = getBestDate(l);
-      if (fTipo && l.tipo_container !== fTipo) return false;
-      if (fExp) {
-        const exp = (l.exportadores || '').toLowerCase();
-        if (!exp.includes(fExp.toLowerCase())) return false;
-      }
-      if (!d) return !fAno && !fMes;
-      if (fAno && d.getFullYear().toString() !== fAno) return false;
-      if (fMes && String(d.getMonth() + 1).padStart(2, '0') !== fMes) return false;
-      return true;
-    });
+    let filtered = withIdx;
+    if (fAno || fMes || fTipo || fExp) {
+      filtered = withIdx.filter(l => {
+        const d = getBestDate(l);
+        if (fTipo && l.tipo_container !== fTipo) return false;
+        if (fExp) {
+          const exp = (l.exportadores || '').toLowerCase();
+          if (!exp.includes(fExp.toLowerCase())) return false;
+        }
+        if (!d) return !fAno && !fMes;
+        if (fAno && d.getFullYear().toString() !== fAno) return false;
+        if (fMes && String(d.getMonth() + 1).padStart(2, '0') !== fMes) return false;
+        return true;
+      });
+    }
+    return filtered.reverse();
   }, [lancamentos, fAno, fMes, fTipo, fExp]);
 
   const { anos, exportadores } = useMemo(() => {
@@ -175,6 +178,15 @@ export default function App() {
               newLancs.splice(idx, 1);
               setLancamentos(newLancs);
               saveData(newLancs);
+              if (sheetsUrl) {
+                setStatus('syncing');
+                syncToSheets(sheetsUrl, newLancs)
+                  .then(() => setStatus('online'))
+                  .catch(e => {
+                    console.warn('Sync warning on delete:', e);
+                    setStatus('offline');
+                  });
+              }
             }
           }}
         />
@@ -195,6 +207,15 @@ export default function App() {
             setLancamentos(newLancs);
             saveData(newLancs);
             setIsModalOpen(false);
+            if (sheetsUrl) {
+              setStatus('syncing');
+              syncToSheets(sheetsUrl, newLancs)
+                .then(() => setStatus('online'))
+                .catch(e => {
+                  console.warn('Sync warning on save:', e);
+                  setStatus('offline');
+                });
+            }
           }}
         />
       )}

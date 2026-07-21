@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Lancamento } from '../types';
 import { computeLanc } from './calculations';
 import { fmt } from './numberUtils';
@@ -56,7 +56,7 @@ export function exportToPDF(lancamentos: Lancamento[]) {
         ];
     });
 
-    (doc as any).autoTable({
+    autoTable(doc, {
         startY: 20,
         head: [['Tipo', 'Ref', 'DI', 'FOB (R$)', 'CIF', 'Valor Aduaneiro', 'Tributos', 'Total', 'Fator']],
         body: tableData,
