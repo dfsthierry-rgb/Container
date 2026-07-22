@@ -3,7 +3,7 @@ import { Ship, Plus, Filter, Download, FileText, Database, HardDrive, RefreshCw 
 import { Lancamento } from './types';
 import { getData, saveData, loadConfigUrl, saveConfigUrl } from './utils/storage';
 import { syncFromSheets, syncToSheets } from './utils/sheets';
-import { getBestDate } from './utils/dateUtils';
+import { getBestDate, makeDate } from './utils/dateUtils';
 import { exportToExcel, exportToPDF } from './utils/exportUtils';
 import Dashboard from './components/Dashboard';
 import LancamentoModal from './components/LancamentoModal';
@@ -68,7 +68,11 @@ export default function App() {
         return true;
       });
     }
-    return filtered.reverse();
+    return filtered.sort((a, b) => {
+      const da = makeDate(a.data_desembaraco)?.getTime() || getBestDate(a)?.getTime() || 0;
+      const db = makeDate(b.data_desembaraco)?.getTime() || getBestDate(b)?.getTime() || 0;
+      return db - da;
+    });
   }, [lancamentos, fAno, fMes, fTipo, fExp]);
 
   const { anos, exportadores } = useMemo(() => {
