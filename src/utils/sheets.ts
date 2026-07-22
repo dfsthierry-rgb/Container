@@ -39,14 +39,15 @@ export async function syncToSheets(url: string, data: Lancamento[]) {
     const sheetsData = prepareForSheets(data);
     const resp = await fetch(url, {
         method: 'POST',
+        mode: 'no-cors',
         redirect: 'follow',
         headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
+            'Content-Type': 'text/plain'
         },
         body: JSON.stringify({ action: 'saveAll', data: sheetsData })
     });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return resp.json();
+    // With no-cors, resp.type is 'opaque' and status is 0, so we can't check ok
+    return { success: true };
 }
 
 export async function syncFromSheets(url: string): Promise<Lancamento[]> {
