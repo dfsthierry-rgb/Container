@@ -43,7 +43,7 @@ export default function LancamentoModal({ isOpen, onClose, lancamento, onSave }:
         const cambio = parseNum(form.cambio);
 
         if (!tipo || fob <= 0 || cambio <= 0) {
-            alert('Preencha: Tipo, Câmbio e FOB (USD)!');
+            alert(`Por favor preencha os campos obrigatórios:\n- Tipo de Container (atual: ${tipo || 'vazio'})\n- Câmbio > 0 (atual: ${cambio})\n- FOB USD > 0 (atual: ${fob})`);
             return;
         }
 

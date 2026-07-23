@@ -1,4 +1,6 @@
-import * as ExcelJS from 'exceljs';
+import fs from 'fs';
+
+const newExportUtils = `import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -215,3 +217,6 @@ export function exportToPDF(lancamentos: Lancamento[]) {
 
     doc.save('lancamentos.pdf');
 }
+`;
+
+fs.writeFileSync('src/utils/exportUtils.ts', newExportUtils);

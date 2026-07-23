@@ -40,8 +40,9 @@ export async function syncToSheets(url: string, data: Lancamento[]) {
     const resp = await fetch(url, {
         method: 'POST',
         redirect: 'follow',
+        cache: 'no-store',
         headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
+            'Content-Type': 'text/plain'
         },
         body: JSON.stringify({ action: 'saveAll', data: sheetsData })
     });
@@ -51,7 +52,7 @@ export async function syncToSheets(url: string, data: Lancamento[]) {
 
 export async function syncFromSheets(url: string): Promise<Lancamento[]> {
     if (!url) throw new Error('No URL configured');
-    const resp = await fetch(url + '?action=getAll', { redirect: 'follow' });
+    const resp = await fetch(url + '?action=getAll&t=' + Date.now(), { redirect: 'follow', cache: 'no-store' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const rawData = await resp.json();
     if (!Array.isArray(rawData)) throw new Error('Dados inválidos');
